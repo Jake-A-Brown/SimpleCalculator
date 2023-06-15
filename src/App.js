@@ -5,7 +5,7 @@ import Display from "./Display";
 const calcData = [
   { id: "clear", value: "AC" },
   { id: "divide", value: "/" },
-  { id: "mujltiply", value: "x" },
+  { id: "multiply", value: "x" },
   { id: "seven", value: 7 },
   { id: "eight", value: 8 },
   { id: "nine", value: 9 },
@@ -49,9 +49,18 @@ const App = () => {
   const [output, setOutput] = useState("");
   const [calculatorData, setCalculatorData] = useState("");
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    const total =eval(calculatorData);
+    setInput(`${total}`)
+    setOutput(`${total}`)
+    setCalculatorData(`${total}`);
+  };
 
-  const handleClear = () => {};
+  const handleClear = () => {
+    setInput('0');
+    setOutput('');
+    setCalculatorData('');
+  };
 
   const handleNumbers = (value) => {
     if (!calculatorData.length) {
@@ -62,18 +71,66 @@ const App = () => {
         setCalculatorData(`${calculatorData}`);
       } else {
         const lastChat = calculatorData.charAt(calculatorData.length - 1);
-        const isLastChatOperator =
+        const isLastCharOperator =
           lastChat === "*" || operators.includes(lastChat);
 
-        setInput(isLastChatOperator ? `${value}` : `${input}${value}`);
+        setInput(isLastCharOperator ? `${value}` : `${input}${value}`);
         setCalculatorData(`${calculatorData}${value}`);
       }
     }
   };
 
-  const dotOperator = () => {};
+  const dotOperator = () => {
+    const lastChar = calculatorData.charAt(calculatorData.length - 1);
+    if(!calculatorData.length){
+      setInput('0.');
+      setCalculatorData('0.');
+    }else{
+      if(lastChar === '*' || operators.includes(lastChar)){
+        setInput('0.');
+        setCalculatorData(`${calculatorData} 0.`);
+      }else{
+        setInput(
+          lastChar==='.'||input.includes('.')?`${input}`:`${input}.`
+          );
+        const formattedValue=lastChar==='.'|| input.includes('.') 
+        ?`${calculatorData}`
+        :`${calculatorData}.`;
+        setCalculatorData(formattedValue);
+      }
+    }
+  };
 
-  const handleOperators = () => {};
+  const handleOperators = (value) => {
+    if(calculatorData.length){
+      setInput(`${value}`);
+      const beforeLastChar=calculatorData.charAt(calculatorData.length-2);
+
+      const beforeLastCharIsOperator=
+        operators.includes(beforeLastChar)||beforeLastChar==='*';
+
+        const lastChat = calculatorData.charAt(calculatorData.length-1);
+
+        const lastCharIsOperator=operators.includes(lastChat)||lastChat==='*';
+
+        const validOp =value==='x'? '*':value;
+
+        if(
+          (lastCharIsOperator&&value!=='-')||
+          (beforeLastCharIsOperator && lastCharIsOperator)
+        ){
+          if(beforeLastCharIsOperator){
+            const updatedValue=`${calculatorData.substring(0, calculatorData.length-2)}
+            ${value}`;
+            setCalculatorData(updatedValue);
+          }else{
+            setCalculatorData(`${calculatorData.substring(0, calculatorData.length-1)}${validOp}`);
+          }
+        }else{
+          setCalculatorData(`${calculatorData}${validOp}`)
+        }
+    }
+  };
 
   const handleInput = (value) => {
     const number = numbers.find((num) => num === value);
@@ -106,7 +163,7 @@ const App = () => {
 
   useEffect(() => {
     handleOutput();
-  }, [calculatorData]);
+  },);
 
   return (
     <div className="container">
